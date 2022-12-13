@@ -5,8 +5,11 @@ import { Link } from 'react-router-dom';
 import { useEffect } from 'react';
 function Posts() {
 	const [data, setData] = useState(null);
+	const [pageNo, setPageNo] = useState(4);
 	async function getPosts() {
-		let dt = await axios.get('https://dummyjson.com/posts');
+		let dt = await axios.get(
+			`https://dummyjson.com/posts?limit=${pageNo}&select=title,reactions,userId`
+		);
 		setData(dt.data.posts);
 		console.log('dt', dt.data);
 	}
@@ -14,9 +17,29 @@ function Posts() {
 		getPosts();
 	}, []);
 
+	const firstEvent = (e) => {
+		//console.log(e);
+		var bottom =
+			e.target.scrollHeight - e.target.scrollTop - e.target.clientHeight < 50;
+		if (bottom) {
+			let pg = pageNo + 1;
+			setPageNo(pg);
+			getPosts();
+		}
+	};
+	// console.log('pagenuo', pageNo);
 	return (
-		<div className="">
-			<h1 className="text-center text-red-500 font-bold text-lg">All Posts</h1>
+		<div className=" ImageAPI" onScroll={firstEvent}>
+			<div className="flex justify-between p-2">
+				<h1 className="text-center text-red-500 font-bold text-lg rounded-md">
+					All Posts
+				</h1>
+				<Link to="/create">
+					<button className="bg-blue-500 px-2 py-2 font-medium text-white rounded-md">
+						Create
+					</button>
+				</Link>
+			</div>
 			<div className=" mt-5  min-w-full flex  flex-wrap border-2 gap-5">
 				{data?.map((curr) => {
 					return (
